@@ -1,0 +1,19 @@
+[package]
+name = "odamp-pqc"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+ring = { workspace = true }
+sha2 = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+hex = { workspace = true }
+zeroize = { workspace = true }
+
+# NIST PQC (use platform-specific crates when available)
+# ml-dsa = "0.1"  # ML-DSA (FIPS 204)
+# slh-dsa = "0.1" # SLH-DSA (FIPS 204)
+# ml-kem = "0.1"  # ML-KEM (FIPS 205)   

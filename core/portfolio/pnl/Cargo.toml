@@ -1,0 +1,12 @@
+[package]
+name = "odamp-portfolio-pnl"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+odamp-portfolio-state = { path = "../state" }
+odamp-market-data = { path = "../../data/market_data" }
+serde = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }   
