@@ -1,0 +1,26 @@
+[package]
+name = "odamp-security"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+# FROST threshold-signature implementation for the secp256k1 curve
+# (the curve used by Bitcoin and Ethereum). Maintained by the Zcash
+# Foundation as part of the RustCrypto/ZF "frost" family of crates,
+# implementing IETF RFC 9591 (Komlo & Goldberg, FROST).
+#
+# Docs: https://docs.rs/frost-secp256k1
+frost-secp256k1 = "2.0"
+rand_core = { version = "0.6", features = ["std"] }
+hex = "0.4"
+
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true

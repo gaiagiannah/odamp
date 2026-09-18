@@ -1,0 +1,28 @@
+[package]
+name = "odamp-api"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+odamp-security = { path = "../core/security" }
+odamp-portfolio = { path = "../core/portfolio" }
+odamp-compliance = { path = "../core/compliance" }
+
+axum = "0.7"
+hex = "0.4"
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+anyhow.workspace = true
+
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "migrate"] }
+dotenvy = "0.15"
+
+[[bin]]
+name = "odamp-api"
+path = "src/main.rs"
