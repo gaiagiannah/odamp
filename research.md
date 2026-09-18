@@ -249,35 +249,35 @@ The flagship platform, built with Dfns:
 
 ### 5.5 The Ecosystem Map
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    ODAMP PLATFORM (This Project)                      │
-├─────────────────────────────────────────────────────────────────────┤
-│  User Layer: Mobile / Web / API / Natural Language                   │
-├─────────────────────────────────────────────────────────────────────┤
-│  AI Agent Layer: Portfolio Mgr | Risk Sentinel | Yield Opt |         │
-│  Compliance Agent | Geopolitical Intel | Scam Detection             │
-├─────────────────────────────────────────────────────────────────────┤
-│  Execution Layer: Smart Order Routing | Cross-Chain | MEV Protect   │
-├─────────────────────────────────────────────────────────────────────┤
-│  Security Layer: MPC + PQC + HSM + ZK Proofs + Confidential Compute │
-├─────────────────────────────────────────────────────────────────────┤
-│  Data Layer: On-chain | Market | Geopolitical | Tax | Analytics     │
-├─────────────────────────────────────────────────────────────────────┤
-│  Integration Layer:                                                  │
-│  ┌──────────┬──────────┬───────────┬──────────┬──────────────────┐  │
-│  │ Talos    │ Chainlink│ Coin      │ LayerZero│ Securitize/Ondo  │  │
-│  │ (exec)   │ (oracle) │ Metrics   │ (bridge) │ (tokenized RWA)  │  │
-│  ├──────────┼──────────┼───────────┼──────────┼──────────────────┤  │
-│  │ Fnality  │ Circle   │ Taurus    │ Inca     │ Silence Labs     │  │
-│  │ (settle) │ (USDC)   │ (custody) │ (intel)  │ (PQ-MPC)         │  │
-│  ├──────────┼──────────┼───────────┼──────────┼──────────────────┤  │
-│  │ Nansen   │ Dune     │ Yearn/    │ QuantConnect│ DTCC/Euroclear│  │
-│  │ (analytics)│ (data)  │ Aave/Morpho│ (algo)   │ (tokenized sec) │  │
-│  └──────────┴──────────┴───────────┴──────────┴──────────────────┘  │
-├─────────────────────────────────────────────────────────────────────┤
-│  Infrastructure: Multi-cloud | Edge | Satellite | Mesh | HSM       │
-└─────────────────────────────────────────────────────────────────────┘
+```text
++-----------------------------------------------------------------------------+
+|                        ODAMP PLATFORM (This Project)                        |
++-----------------------------------------------------------------------------+
+| User Layer: Mobile / Web / API / Natural Language                           |
++-----------------------------------------------------------------------------+
+| AI Agent Layer: Portfolio Mgr | Risk Sentinel | Yield Opt |                 |
+| Compliance Agent | Geopolitical Intel | Scam Detection                      |
++-----------------------------------------------------------------------------+
+| Execution Layer: Smart Order Routing | Cross-Chain | MEV Protect           |
++-----------------------------------------------------------------------------+
+| Security Layer: MPC + PQC + HSM + ZK Proofs + Confidential Compute          |
++-----------------------------------------------------------------------------+
+| Data Layer: On-chain | Market | Geopolitical | Tax | Analytics              |
++-----------------------------------------------------------------------------+
+| Integration Layer:                                                          |
+| +------------+------------+------------+------------+---------------------+ |
+| | Talos      | Chainlink  | Coin       | LayerZero  | Securitize/Ondo     | |
+| | (exec)     | (oracle)   | Metrics    | (bridge)   | (tokenized RWA)     | |
+| +------------+------------+------------+------------+---------------------+ |
+| | Fnality    | Circle     | Taurus     | Inca       | Silence Labs        | |
+| | (settle)   | (USDC)     | (custody)  | (intel)    | (PQ-MPC)            | |
+| +------------+------------+------------+------------+---------------------+ |
+| | Nansen     | Dune       | Yearn/     | Quant      | DTCC/Euroclear      | |
+| | (analytics)| (data)     | Aave/Morpho| Connect    | (tokenized sec)     | |
+| +------------+------------+------------+------------+---------------------+ |
++-----------------------------------------------------------------------------+
+| Infrastructure: Multi-cloud | Edge | Satellite | Mesh | HSM                 |
++-----------------------------------------------------------------------------+
 ```
 
 ---
@@ -382,7 +382,7 @@ ODAMP is to digital asset management what **Android** was to mobile computing: a
 
 ### 9.1 High-Level Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         ODAMP SYSTEM ARCHITECTURE                        │
 ├─────────────────────────────────────────────────────────────────────────┤
@@ -796,34 +796,31 @@ The **most geopolitically significant** tokenization category:
 
 ODAMP presents all of the above in a **single dashboard**:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    YOUR PORTFOLIO                            │
-├─────────────────────────────────────────────────────────────┤
-│  Total Value: $284,392.17  │  24h: +1.2%  │  30d: +4.7%   │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐  │
-│  │ Digital     │ │ Tokenized   │ │ Tokenized           │  │
-│  │ Assets      │ │ Securities  │ │ Commodities         │  │
-│  │ $142,200    │ │ $67,100     │ │ $34,500             │  │
-│  │ (50%)       │ │ (24%)       │ │ (12%)               │  │
-│  │ BTC, ETH,   │ │ xStocks,    │ │ Gold (PAXG),        │  │
-│  │ USDC, SOL   │ │ Ondo T-bills│ │ Rare Earths (Metals)│  │
-│  └─────────────┘ └─────────────┘ └─────────────────────┘  │
-│                                                             │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐  │
-│  │ Tokenized   │ │ DeFi        │ │ CBDC / Stablecoin   │  │
-│  │ Real Estate │ │ Yield       │ │                     │  │
-│  │ $21,300     │ │ $12,700     │ │ $6,592              │  │
-│  │ (8%)        │ │ (4%)        │ │ (2%)                │  │
-│  │ RealT,      │ │ Aave,       │ │ USDC, USDT,         │  │
-│  │ Centrifuge  │ │ Morpho, LP  │ │ (Digital Euro)      │  │
-│  └─────────────┘ └─────────────┘ └─────────────────────┘  │
-│                                                             │
-│  Risk: MODERATE │ Sharpe: 1.42 │ Max DD (30d): -3.2%      │
-│  Tax Exposure (unrealized): $12,400 │ Next Filing: 4/15   │
-└─────────────────────────────────────────────────────────────┘
+```text
++-----------------------------------------------------------------------------+
+|                                YOUR PORTFOLIO                               |
++-----------------------------------------------------------------------------+
+| Total Value: $284,392.17   |   24h: +1.2%   |   30d: +4.7%                  |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  +--------------------+   +--------------------+   +--------------------+   |
+|  | Digital Assets     |   | Tokenized Sec.     |   | Tokenized Cmdty.   |   |
+|  | $142,200 (50%)     |   | $67,100 (24%)      |   | $34,500 (12%)      |   |
+|  | BTC, ETH, USDC,    |   | xStocks, Ondo      |   | Gold (PAXG),       |   |
+|  | SOL                |   | T-bills            |   | Rare Earths        |   |
+|  +--------------------+   +--------------------+   +--------------------+   |
+|                                                                             |
+|  +--------------------+   +--------------------+   +--------------------+   |
+|  | Tokenized R.E.     |   | DeFi Yield         |   | CBDC / Stablecoin  |   |
+|  | $21,300 (8%)       |   | $12,700 (4%)       |   | $6,592 (2%)        |   |
+|  | RealT, Centrifuge  |   | Aave, Morpho, LP   |   | USDC, USDT,        |   |
+|  |                    |   |                    |   | (Digital Euro)     |   |
+|  +--------------------+   +--------------------+   +--------------------+   |
+|                                                                             |
++-----------------------------------------------------------------------------+
+| Risk: MODERATE  |  Sharpe: 1.42  |  Max DD (30d): -3.2%                      |
+| Tax Exposure (unrealized): $12,400  |  Next Filing: 4/15                      |
++-----------------------------------------------------------------------------+
 ```
 
 ---
