@@ -1,0 +1,31 @@
+Create a new threshold wallet (DKG ceremony).
+
+Request:
+
+{
+  "user_id": "uuid",
+  "chain": "ethereum",
+  "threshold": 2,
+  "total_shares": 3
+}
+
+Response:
+
+{
+  "wallet": {
+    "id": "uuid",
+    "user_id": "uuid",
+    "chain": "ethereum",
+    "address": "0x...",
+    "group_public_key": "hex",
+    "threshold": 2,
+    "total_shares": 3,
+    "created_at": "2026-09-18T12:00:00Z"
+  },
+  "key_shares": [
+    { "share_id": 1, "encrypted_share": "base64" },
+    { "share_id": 2, "encrypted_share": "base64" },
+    { "share_id": 3, "encrypted_share": "base64" }
+  ],
+  "warning": "Store these key shares securely. They will NOT be available again."
+}

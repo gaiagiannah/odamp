@@ -1,0 +1,41 @@
+# Rust
+target/
+*.rs.bk
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node (Phase 6 frontend only)
+node_modules/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Keys (NEVER commit)
+.keys/
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Build
+dist/
+build/
+
+# Database
+*.db
+*.sqlite   

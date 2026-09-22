@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug API",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/services/ai-agent/app.py",
+      "console": "integratedTerminal",
+      "env": { "PYTHONPATH": "${workspaceFolder}/services/ai-agent" }
+    },
+    {
+      "name": "Run API (Rust)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/target/debug/odamp-api",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Run CLI (Rust)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/target/debug/odamp",
+      "args": ["--help"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}   

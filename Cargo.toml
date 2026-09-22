@@ -1,0 +1,66 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/shared",
+    "crates/security-core",
+    "crates/compliance",
+    "crates/portfolio",
+    "crates/indexer",
+    "apps/api",
+    "apps/cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[workspace.dependencies]
+# Crypto
+frost-secp256k1-evm = "2.2"
+frost-core = "3.0"
+frost-secp256k1 = "3.0"
+ml-kem = "0.2"
+aes-gcm = "0.10"
+argon2 = "0.5"
+rand = "0.8"
+sha2 = "0.10"
+hkdf = "0.12"
+
+# Web / API
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+jsonwebtoken = "9"
+uuid = { version = "1", features = ["v4", "serde"] }
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "json", "chrono"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Blockchain
+alloy = "0.3"
+alloy-primitives = "0.7"
+alloy-sol-types = "0.7"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+dialoguer = "0.11"
+colored = "2"
+
+# Logging / Error
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+thiserror = "1"
+anyhow = "1"
+
+# Internal crates
+odamp-shared = { path = "crates/shared" }
+odamp-security-core = { path = "crates/security-core" }
+odamp-compliance = { path = "crates/compliance" }
+odamp-portfolio = { path = "crates/portfolio" }
+odamp-indexer = { path = "crates/indexer" }   

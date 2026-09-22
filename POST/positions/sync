@@ -1,0 +1,6 @@
+{
+  "wallet_id": "uuid",
+  "targets": [
+    { "wallet_address": "0x...", "chain": "ethereum", "tokens": ["NATIVE", "usd-coin", "tether"] }
+  ]
+}   

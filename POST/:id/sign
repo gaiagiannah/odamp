@@ -1,0 +1,20 @@
+Sign a message using FROST threshold signing.
+
+Request:
+
+{
+  "message": "hex-encoded-bytes",
+  "shares": [
+    { "share_id": 1, "encrypted_share": "base64", "password": "..." },
+    { "share_id": 2, "encrypted_share": "base64", "password": "..." }
+  ]
+}
+
+Response:
+
+{
+  "signature": "65-byte-hex",
+  "wallet_id": "uuid",
+  "signed_at": "2026-09-18T12:00:00Z"
+}
+

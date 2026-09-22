@@ -1,0 +1,16 @@
+{
+  "rust-analyzer.cargo.workspaceRoot": "${workspaceFolder}",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "rust-lang.rust-analyzer",
+  "python.defaultInterpreterPath": "${workspaceFolder}/services/ai-agent/.venv/bin/python",
+  "files.exclude": {
+    "**/target": true,
+    "**/__pycache__": true,
+    "**/.venv": true
+  },
+  "search.exclude": {
+    "**/target": true,
+    "**/node_modules": true,
+    "**/.venv": true
+  }
+}   

@@ -1,150 +1,538 @@
-ODAMP: Open Digital Asset Management Platform
-A Technical and Policy Whitepaper on Institutional-Grade Security, AI Automation, and Multi-Asset Tokenization for the Individual Investor
+```markdown
+# ODAMP: Open Digital Asset Management Platform
 
-Abstract
-Digital finance has reproduced, rather than dissolved, the access asymmetries of traditional finance. Institutional actors operate with multi-party cryptographic custody, smart order routing across hundreds of venues, machine-readable risk intelligence, and forthcoming quantum-safe signatures. Individual investors, by contrast, typically hold a single private key in a software wallet, trade through rate-limited exchange interfaces, and have no unified view of their exposure across chains, protocols, or asset classes. This paper specifies ODAMP (Open Digital Asset Management Platform): an open-core system that applies threshold cryptography, post-quantum signatures, explainable AI agents, and on-chain compliance tooling to the management of both native digital assets and tokenized real-world assets. The paper distinguishes clearly between what is technically achievable by an independent development effort today, and what depends on regulatory licensure or institutional partnership that lies outside a single project's control. It is written as a foundation for actual implementation, not a pitch deck — claims are cited to primary standards documents, peer-reviewed and preprint cryptography literature, and named regulatory texts, and areas of genuine uncertainty (market-size projections, timelines) are presented as ranges with their sources, not single invented numbers.
+**A Whitepaper on Threshold-Cryptographic Custody, Post-Quantum Key Exchange, and AI-Driven Portfolio Intelligence for Native and Tokenized Real-World Assets**
 
-1. Introduction and Motivation
-1.1 The Access Gap Is Measurable, Not Rhetorical
-The case for democratized access to sophisticated financial infrastructure is often made rhetorically. It can also be made with reference to specific, citable facts.
+---
 
-In the United States, eligibility to invest in private securities offerings under Regulation D is gated by the SEC's "accredited investor" definition: a natural person must have an individual income above $200,000 (or $300,000 jointly with a spouse) in each of the prior two years, or a net worth exceeding $1 million excluding primary residence.[^1] This threshold was set in 1982 and has never been adjusted for inflation; the SEC's own 2015 staff report calculated that an inflation-adjusted net-worth threshold would be roughly $2.16–2.45 million.[^2] Because the rule uses wealth as a proxy for financial sophistication, both SEC commissioners and outside researchers have argued that it excludes many sophisticated but non-wealthy investors while admitting wealthy but unsophisticated ones.[^3] This is not a crypto-specific critique — it is a structural feature of how access to certain investment classes is currently gated in the U.S. market.
+## Abstract
 
-Globally, the picture is one of large but shrinking exclusion. The World Bank's Global Findex 2025 Database — a survey of roughly 148,000 adults across 141 economies — found that 79% of adults worldwide now hold a formal financial account, up from 74% in 2021, but 1.3 billion adults remain outside the formal financial system entirely, with more than half concentrated in eight countries (Bangladesh, China, Egypt, India, Indonesia, Mexico, Nigeria, and Pakistan).[^4] Roughly 40% of adults in developing economies report being unable to reliably access emergency funds.[^5] These are the populations for whom mobile-first, low-bandwidth, stablecoin-capable financial tooling is not a convenience but a substitute for infrastructure that does not otherwise reach them.
+ODAMP is an open-core, self-hosted platform for managing digital asset portfolios across EVM and Solana chains. It combines FROST 2-of-3 threshold signing (secp256k1, keccak256) with post-quantum key exchange (ML-KEM-768), real-time multi-chain portfolio indexing, OFAC sanctions screening, LLM-backed risk analysis with logged explainable reasoning, and policy-based automated execution on testnet environments. The platform is designed for individual professionals and small teams who require institutional-grade security primitives without institutional-grade vendor lock-in. All components are MIT-licensed; a commercial tier will add HSM-backed custody, mainnet execution, and managed infrastructure.
 
-1.2 The Cost of Insecurity Is Also Measurable
-The counter-argument to "just let anyone use DeFi tools" is that self-custodied digital assets have a well-documented loss profile. According to Chainalysis's 2026 Crypto Crime Report, approximately $3.4 billion in digital assets was stolen in service-side hacks between January and early December 2025 — the second-worst year on record after 2022's $3.7–3.8 billion.[^6] A single incident, the February 2025 Bybit exchange hack, accounted for roughly $1.5 billion in one day and was attributed by the FBI to North Korea's Lazarus Group / TraderTraitor cluster.[^7] North Korea-affiliated actors alone were responsible for an estimated $2.02 billion of 2025's stolen funds, a 51% year-over-year increase, bringing their cumulative confirmed total since tracking began to roughly $6.75 billion.[^7] In earlier years, cross-chain bridges alone accounted for a majority of DeFi-specific losses (64% of DeFi losses in 2022).[^8]
+---
 
-These are not edge cases. They are a structural consequence of a security model — a single private key, or a custom-built bridge contract, controlling large pooled value — that institutional finance abandoned decades ago in favor of multi-party authorization, hardware security modules, and continuous auditing. ODAMP's starting premise is that the same underlying cryptographic tools that make institutional custody safe are now mature and open enough to be deployed at individual scale, and that doing so is a security intervention, not just an accessibility one.
+## 1. The Problem
 
-1.3 What This Paper Is and Is Not
-This paper is a technical and policy specification for a project under active development. It is explicitly not:
+### 1.1 The Custody Gap
 
-A claim that the described system is regulated, licensed, or ready for public deposit-taking.
-A promise of specific investment returns or risk elimination.
-A claim that every institutional integration named here (bank rails, HSM vendors, custody licenses) is contracted or in place. Where a component requires regulatory status the project does not yet hold, this paper says so.
-It is:
+The digital asset landscape presents a binary choice for individual professionals and small teams:
 
-A specification of a real, buildable architecture using standardized, publicly available cryptographic primitives (Sections 3–4).
-A mapping of the compliance obligations that apply to this category of product, cited to their source texts (Section 6).
-An honest accounting of what remains aspirational versus implemented (Section 8).
-2. Design Principles
-ODAMP is organized around six commitments, each of which has a direct architectural consequence:
+| Option | Security | Cost | Autonomy |
+|---|---|---|---|
+| Exchange (Coinbase, Kraken) | Custodial — you don't hold keys | Low | None. KYC, withdrawal limits, platform risk |
+| Self-custody (MetaMask, Phantom) | Non-custodial — you hold keys | Low | Full, but single-key = single point of failure |
+| Institutional (Fireblocks, Dfns, Copper) | MPC/HSM, multi-sig, compliance | $50K–$500K+/yr | Full, but enterprise-only pricing and contracts |
 
-Principle	Architectural Consequence
-Keys are user-held, not custodial	No ODAMP-operated entity ever possesses a complete private key. Threshold cryptography (Section 3.1) is used so that no single party — including the platform operator — can unilaterally move funds.
-Security scales to exposure, not to price	A user with $200 in holdings should not need to perform a hardware-backed key ceremony; a user with $200,000 should not be protected by the same single-device setup as the former.
-Every automated decision is explainable	AI agents (Section 5) must produce a plain-language, auditable rationale for every action or recommendation. An agent that cannot explain itself cannot execute.
-Compliance obligations are met, not evaded	Sanctions screening and Travel Rule obligations that apply to virtual asset service providers are treated as engineering requirements, not obstacles to architect around (Section 6).
-The system degrades gracefully	If the network, the AI backend, or a cloud provider is unavailable, balance viewing and local signing must continue to function.
-What is not yet real is labeled as such	Any integration standing in for a regulated institutional service (e.g., a testnet execution venue standing in for a licensed broker-dealer relationship) is visibly marked as such in the product, not silently presented as production-grade.
-3. Security Architecture
-3.1 Threshold Signatures: The Cryptographic Foundation
-The mathematical basis for splitting a secret among multiple parties dates to Adi Shamir's 1979 paper "How to Share a Secret," which showed that a secret can be divided into n shares such that any k of them reconstruct it, while fewer than k reveal nothing.[^9] Modern threshold-signature schemes extend this idea so that a group of parties can jointly produce a valid digital signature without ever reconstructing the private key in one place — meaning no single device, server, or person is ever a single point of failure or a single point of compromise.
+**No option exists** for a professional managing $100K–$5M in digital assets who wants:
+- No single point of key failure
+- Post-quantum key exchange
+- Real-time portfolio visibility across chains
+- Automated compliance screening
+- AI-assisted risk analysis
+- Policy-based execution without a $200K/yr vendor contract
 
-For the elliptic-curve signature scheme used by most existing blockchains (ECDSA), Gennaro and Goldfeder's 2018 paper "Fast Multiparty Threshold ECDSA with Fast Trustless Setup" (ACM CCS '18) is a foundational construction still cited as a reference implementation basis by production custody systems.[^10] For Schnorr-family signatures (used by Bitcoin Taproot and increasingly by newer chains), the relevant standard is FROST (Flexible Round-Optimized Schnorr Threshold signatures), introduced by Chelsea Komlo and Ian Goldberg at SAC 2020.[^11] FROST reduces the number of network communication rounds required to produce a threshold signature relative to earlier schemes, which matters directly for mobile and low-bandwidth deployments. FROST has since been formalized by the IETF as RFC 9591 (2024), giving it the status of an interoperable internet standard rather than a single vendor's proprietary protocol.[^12]
+### 1.2 The Security Problem
 
-ODAMP's key-management layer is specified to use these standardized constructions — not a bespoke, unaudited scheme — precisely because threshold cryptography is an area where novel, unreviewed designs have historically been where implementations fail even when the underlying signature algorithm is sound.
+Standard self-custody wallets use a single private key. If that key is compromised — via malware, phishing, or physical theft — the entire portfolio is lost. There is no recovery, no multi-party approval, no audit trail.
 
-Practical tiering. Following the "no single point of failure" principle, key shares are distributed across independent custody domains (e.g., user device, encrypted backup, and — for larger holdings — a hardware-backed share), with the threshold (e.g., 2-of-3) chosen so that any one compromised or lost share does not, by itself, either freeze funds or leak the key.
+Post-quantum cryptography (PQC) has been finalized by NIST (FIPS 203: ML-KEM, FIPS 204: ML-DSA) but has not been integrated into any mainstream wallet product. The key *exchange* layer of wallet operations remains vulnerable to a future quantum adversary who could intercept and decrypt classical key exchange traffic.
 
-3.2 Post-Quantum Cryptography
-In August 2024, the U.S. National Institute of Standards and Technology finalized three post-quantum cryptography standards after an eight-year, multi-round public evaluation process:[^13]
+### 1.3 The Intelligence Gap
 
-FIPS 203 (ML-KEM), a module-lattice key-encapsulation mechanism derived from CRYSTALS-Kyber, providing quantum-resistant key exchange with three parameter sets (ML-KEM-512/768/1024).[^14]
-FIPS 204 (ML-DSA), a module-lattice digital signature scheme derived from CRYSTALS-Dilithium, with security levels ML-DSA-44/65/87 corresponding roughly to AES-128/192/256 equivalent strength.[^13][^14]
-FIPS 205 (SLH-DSA), a stateless hash-based signature scheme derived from SPHINCS+, whose security rests only on the collision-resistance of hash functions rather than lattice-hardness assumptions — providing algorithmic diversity as a hedge in case lattice-based schemes are ever weakened.[^13]
-A fourth algorithm, FN-DSA (Falcon), is in final standardization as FIPS 206.[^15] NIST additionally selected HQC as a fifth, code-based backup key-encapsulation mechanism in March 2025, providing a mathematically independent alternative to ML-KEM.[^16]
+Existing portfolio tools (Zerion, DeBank, Revert Finance) provide:
+- Balance aggregation
+- P&L tracking
+- Basic allocation views
 
-These are not abstractions with distant deadlines. The NSA's Commercial National Security Algorithm Suite 2.0 (CNSA 2.0) sets 2030 as the mandatory PQC migration deadline for National Security Systems.[^17] The practical concern motivating this timeline is "harvest now, decrypt later": an adversary can record encrypted traffic or signed transactions today and decrypt or forge them once a cryptographically relevant quantum computer exists, meaning long-lived financial records and custody signatures are exposed now even though the quantum threat itself is not yet realized.
+They do **not** provide:
+- Anomaly detection on wallet activity
+- Risk scoring with explainable reasoning
+- Automated compliance screening (OFAC, sanctions)
+- Policy-based execution (if X then Y)
+- LLM-backed analysis that logs its reasoning for audit
 
-Implementation reality check. Post-quantum signatures are substantially larger and, in some cases, slower than classical ones: ML-DSA-65 signatures run 2,420–4,595 bytes versus roughly 64–72 bytes for an ECDSA/Schnorr signature, and SLH-DSA signatures are 7,856–49,856 bytes.[^13][^18] Efficient threshold (multi-party) versions of these PQC signature schemes are an active, unsettled research area as of 2026 — for example, the "TALUS" and "Trilithium" constructions for threshold ML-DSA are 2025–2026 preprints, not yet standardized or battle-tested in production.[^19] ODAMP's honest position is therefore a hybrid strategy: classical threshold signatures (FROST/ECDSA-threshold) in production now, with ML-DSA/ML-KEM layered in dual-signature mode as the threshold-PQC research matures — consistent with NIST's own guidance to migrate via hybrid classical+PQC schemes rather than a single flag-day cutover.
+### 1.4 The Tokenized RWA Problem
 
-3.3 Transaction-Level Protections
-Independent of key management, the execution layer applies defense-in-depth controls that do not depend on any single vendor: pre-signing transaction simulation (so the user sees the exact state change before authorizing it), address allowlisting, configurable spending limits, and static/dynamic analysis of any smart contract before interaction. These are standard practice among security-conscious wallets and are included here as baseline requirements rather than differentiators.
+Tokenized real-world assets (Treasuries, money market funds, private credit, real estate) are growing from ~$36B (2025) to an estimated $5.5T–$11T by 2030. But there is no self-hosted tool that:
+- Tracks tokenized RWA positions alongside native tokens
+- Screens RWA counterparties against sanctions lists
+- Provides unified risk metrics across both asset classes
+- Automates rebalancing between native and tokenized positions
 
-4. Blockchain Intelligence and Data Architecture
-A unified portfolio view requires aggregating on-chain state across multiple chains and asset standards (native tokens, ERC-20/721/1155, SPL tokens, DeFi LP positions) into a single, real-time model of what a user actually owns and what it is worth. This is a data-engineering problem, not a cryptographic one, and ODAMP treats it as such: an indexing layer that reads public chain state, a pricing layer that aggregates market data from multiple sources to avoid single-oracle dependency, and a risk-analytics layer that computes standard risk-adjusted metrics (Sharpe ratio, maximum drawdown, concentration risk) rather than presenting only raw balances. Public sanctions-list data (Section 6) and open smart-contract-risk datasets are treated as additional data feeds into this same layer, not a separate bolt-on.
+---
 
-5. The AI Agent Layer
-5.1 Why Explainability Is a Hard Requirement, Not a Feature
-Autonomous financial agents are not a hypothetical risk category. Multiple 2025–2026 incidents — including exploits targeting AI-driven trading agents — have demonstrated that unconstrained autonomous execution in DeFi can produce losses with no clear post-hoc accountability trail. Regulators evaluating AI in financial contexts (for example, under the EU AI Act's treatment of high-risk AI systems, and existing U.S. suitability/best-execution obligations for automated advice) consistently return to the same requirement: a system that makes or influences financial decisions must be able to produce a record of why it acted.
+## 2. The Solution
 
-ODAMP's agent architecture therefore enforces, as non-negotiable constraints:
+### 2.1 What ODAMP Is
 
-Bounded authority: every agent operates within user-set spending limits and asset-class restrictions that the agent cannot itself modify.
-Mandatory reasoning trace: every agent action is logged with a plain-language rationale before execution, not generated retroactively.
-Human-in-the-loop above a threshold: any single action above a user-configurable dollar threshold requires explicit confirmation.
-Circuit breakers: an agent whose actions produce losses beyond a set threshold is automatically suspended pending review.
-5.2 Interoperability
-Agents are built to communicate with tools and data sources through the Model Context Protocol (MCP), an open specification for connecting AI systems to external tools and data, rather than a closed, single-vendor agent framework — so that the agent layer is not permanently locked to one AI provider's proprietary tool-calling format.
+ODAMP is a **self-hosted, open-core digital asset management platform** that provides:
 
-6. Regulatory and Compliance Architecture
-This is the section where the gap between "aspirational institutional-grade" and "actually compliant" matters most, and where this paper is deliberately conservative.
+1. **Threshold cryptographic custody** — FROST 2-of-3 signing on secp256k1 (keccak256). No full private key ever exists. The on-chain wallet is a Safe smart account verified via the `safe-frost` EIP-1271 verifier (~5,600 gas).
 
-6.1 Sanctions Screening
-The U.S. Treasury's Office of Foreign Assets Control (OFAC) maintains the Specially Designated Nationals (SDN) list, a public dataset. Real-time screening of transaction counterparties against this list — and equivalent EU/UN lists — is a genuinely implementable feature for an independent project, because the underlying data is public. This is treated as a first-class, buildable compliance feature rather than aspirational infrastructure.
+2. **Post-quantum key exchange** — ML-KEM-768 (NIST FIPS 204) for the key generation ceremony (DKG). Hybrid with X25519 for forward compatibility. Key shares encrypted at rest with AES-256-GCM.
 
-6.2 The Travel Rule
-FATF Recommendation 16 (the "Travel Rule"), extended to virtual asset service providers (VASPs) in FATF's 2019 guidance, requires VASPs to collect, verify, and transmit originator and beneficiary information — name, account number, and identifying details — for virtual-asset transfers above a threshold (historically USD/EUR 1,000), including transfers involving self-hosted wallets.[^20] The EU's implementation is the Transfer of Funds Regulation (TFR).[^20] Critically, Travel Rule compliance is an obligation of regulated VASPs transmitting funds on behalf of customers — it presumes the existence of a licensed entity. A self-custodial tool where the user alone holds signing authority sits in a different regulatory posture than a custodial exchange, but the architecture is specified to support Travel Rule data exchange for any regulated on/off-ramp integration, because that is the direction global policy is unambiguously moving.
+3. **Multi-chain portfolio engine** — Real-time indexing of native tokens, ERC-20s, SPL tokens, and tokenized RWAs across Ethereum, Base, Arbitrum, BSC, and Solana. Live pricing via CoinGecko (fallback: Chainlink on-chain). Risk metrics: Sharpe, Sortino, VaR(95), max drawdown, Herfindahl-Hirschman Index (concentration).
 
-6.3 Broader Regulatory Landscape
-Relevant frameworks that any real deployment must track jurisdiction-by-jurisdiction include the EU's Markets in Crypto-Assets Regulation (MiCA, applicable since December 2024) and its associated DAC8 tax-reporting rules; U.S. state money-transmitter licensing; and, for stablecoin-related settlement rails, the U.S. GENIUS Act framework for payment stablecoins. None of these are optional "nice to haves" for a product operating in this space — they define whether specific features (holding customer funds, transmitting third-party payments, issuing a token) are legally available at all in a given jurisdiction, and a from-scratch project does not have these licenses on day one. The architecture is built so that regulated capabilities (custody, transmission) are pluggable behind an interface that a licensed partner can fill in, rather than assumed.
+4. **OFAC sanctions screening** — Pre-flight screening of all transaction counterparties against the OFAC SDN list (public, auto-refreshed daily). Hard block on match. Full audit log.
 
-7. Tokenization of Real-World Assets: Scope and Honest Market Sizing
-Tokenized real-world assets are a genuine, growing category — but public projections of its eventual size vary by an order of magnitude depending on scope and methodology, and a credible whitepaper should show that range rather than quote the single largest number available.
+5. **AI risk agent (Risk Sentinel)** — LLM-backed analysis of real portfolio state. Produces structured, explainable output: each finding includes a claim, evidence, confidence score, and source. All LLM calls logged (prompt, response, model, tokens, latency).
 
-McKinsey (2024), using a conservative scope that explicitly excludes stablecoins, tokenized deposits, and CBDCs, projected roughly $2 trillion in tokenized financial assets by 2030 in its base case, $4 trillion in a bullish case, and noted that "broad adoption of tokenization is still far away."[^21]
-Boston Consulting Group, using a broader "10% of global GDP" heuristic across illiquid asset classes, has published figures ranging from an early $16 trillion by 2030 estimate to a more recent BCG/Ripple joint estimate of roughly $9.4 trillion by 2030 and ~$19 trillion by 2033.[^22]
-Standard Chartered has published a more bullish $30.1 trillion by 2034 estimate.[^22]
-As of early 2026, independent tracking suggests the actual tokenized RWA market (excluding stablecoins) is roughly $12 billion, dominated by tokenized private credit ($8–9B) and tokenized U.S. Treasuries ($3B) — several orders of magnitude below any of the 2030 projections.[^23]
-The honest reading: tokenization of traditional financial instruments (money-market funds, Treasuries, private credit) is real and growing today; tokenization of physical/illiquid assets (real estate, commodities, infrastructure) is, per McKinsey's own analysis, held back by "marginal benefits, feasibility concerns, complex compliance requirements, or lack of incentive for key industry players."[^21] ODAMP's asset-coverage roadmap is therefore sequenced to start with the categories that are actually liquid and tokenized today — tokenized Treasuries, tokenized gold (e.g., PAXG, XAUT, which together represent the large majority of tokenized gold value), and major equities/ETF tokenization efforts — before extending toward less mature categories like tokenized real estate or commodities, rather than presenting all categories as equally available now.
+6. **Policy-based execution** — Deterministic trigger→action engine. Pre-trade simulation (slippage, gas, impact). DEX aggregator integration (1inch testnet). FROST 2-of-3 signing → Safe execution. All execution on testnet in v0.x.
 
-8. Honest Assessment of Current Limitations
-A whitepaper that omits its own weaknesses is not institutional-grade; it is marketing. The following are acknowledged, specific limitations of the architecture as of this writing:
+### 2.2 What ODAMP Is Not
 
-No custody license. ODAMP as an independent project does not hold money-transmitter, broker-dealer, or trust-company status in any jurisdiction. Self-custodial architecture (Section 3) is chosen specifically because it reduces — but does not eliminate — the regulatory perimeter the project must clear to operate lawfully.
-Threshold post-quantum signatures are not production-ready. As discussed in Section 3.2, efficient threshold ML-DSA is 2025–2026 research, not a deployed standard. Any near-term PQC claim must describe hybrid classical+PQC signing, not pure threshold-PQC.
-Tokenized RWA liquidity is thin. Per Section 7, most tokenization categories described in earlier drafts of this project's research are not yet liquid, tradable markets — they are pilots.
-AI agent explainability is a design requirement, not a solved problem. Producing reliable, faithful natural-language rationales for automated financial decisions — rather than plausible-sounding post-hoc justifications — remains an open challenge across the industry, and the guardrails in Section 5.1 (bounded authority, human-in-the-loop, circuit breakers) are treated as necessary precisely because explainability alone cannot be fully guaranteed.
-Compliance infrastructure requires ongoing jurisdiction-specific legal review that a technical specification cannot substitute for.
-9. Implementation Roadmap (Scoped to Buildable Reality)
-Rather than the multi-year, 20+-person roadmap of earlier drafts of this research, the roadmap below is scoped to what a focused development effort can build and demonstrate, phase by phase, with each phase producing a genuinely working artifact:
+- Not an exchange. It does not hold user funds on behalf of users.
+- Not a custodian. It does not require a custodian license.
+- Not a DeFi protocol. It does not issue tokens or create liquidity.
+- Not a compliance vendor. OFAC SDN screening is included; full KYC/AML/MiCA reporting is a commercial-tier concern.
+- Not a mainnet execution platform in v0.x. All execution is on testnet.
 
-Phase	Deliverable	What Makes It Real (not simulated)
-0 — Foundation	Repo structure, database schema, API skeleton	Runs locally; no placeholder services
-1 — Security Core	Working 2-of-3 FROST threshold wallet; key generation and signing ceremony	Real cryptographic library (e.g., frost-secp256k1), real testnet transactions
-2 — Portfolio Engine	Multi-chain balance indexer + real market pricing + real risk metrics	Real on-chain reads (public RPC/indexer APIs), not mock data
-3 — Compliance Layer	OFAC SDN screening against transaction addresses	Real public sanctions dataset, real matching logic
-4 — AI Agent Layer	One agent (e.g., Risk Sentinel) with logged, explainable reasoning	Real LLM-backed analysis of real portfolio state
-5 — Execution (testnet)	Simulated + testnet order execution with pre-trade simulation	Real DEX aggregator APIs against testnets
-6 — Frontend	Unified dashboard	Reflects real data from phases 1–5
-Each phase explicitly ends with something that can be run and shown — not a folder of stubs.
+---
 
-10. Conclusion
-The individual components this paper describes are real: threshold signatures are a standardized, IETF-ratified construction; post-quantum cryptography has been finalized by NIST; sanctions data is public; on-chain data is public; explainable-AI guardrails are an active, serious design discipline. What does not yet exist, and what this project sets out to build, is the integration of these components into a single, honestly-labeled system that gives an individual meaningfully better security and transparency than a single-key software wallet — without overstating its regulatory status or its market. That is the standard this whitepaper holds itself to, and the standard the resulting code should be held to as well.
+## 3. Architecture
 
-References
-[^1]: U.S. Securities and Exchange Commission, Regulation D, Rule 501, Securities Act of 1933, definition of "accredited investor." 
-[^2]: U.S. SEC, Report on the Review of the Definition of "Accredited Investor," December 2015. 
-[^3]: Cato Institute, "Let Investors Decide, Part 1" (commentary on SEC accredited investor rulemaking, citing SEC Commissioners Elad Roisman and Hester Peirce). 
-[^4]: World Bank, The Global Findex Database 2025, based on surveys of ~148,000 adults across 141 economies conducted in 2024. 
-[^5]: World Bank, Global Findex 2025 Executive Summary — emergency-funds access indicator. 
-[^6]: Chainalysis, 2026 Crypto Crime Report (introduction and stolen-funds update), covering January–early December 2025. 
-[^7]: Chainalysis 2026 Crypto Crime Report; FBI Internet Crime Complaint Center (IC3) public service announcement attributing the February 21, 2025 Bybit incident to North Korea's TraderTraitor/Lazarus Group cluster. 
-[^8]: Chainalysis, 2023 Crypto Crime Report (2022 annual data on DeFi and cross-chain bridge losses). 
-[^9]: A. Shamir, "How to Share a Secret," Communications of the ACM, 1979. 
-[^10]: R. Gennaro and S. Goldfeder, "Fast Multiparty Threshold ECDSA with Fast Trustless Setup," Proceedings of the 2018 ACM SIGSAC Conference on Computer and Communications Security (CCS '18), pp. 1179–1194. 
-[^11]: C. Komlo and I. Goldberg, "FROST: Flexible Round-Optimized Schnorr Threshold Signatures," Selected Areas in Cryptography (SAC) 2020, LNCS vol. 12804, pp. 34–65, Springer, 2021. 
-[^12]: D. Connolly, C. Komlo, I. Goldberg, C. A. Wood, "The Flexible Round-Optimized Schnorr Threshold (FROST) Protocol for Two-Round Schnorr Signatures," IETF RFC 9591, 2024. 
-[^13]: NIST, FIPS 203 (ML-KEM), FIPS 204 (ML-DSA), FIPS 205 (SLH-DSA), finalized August 13, 2024. 
-[^14]: NIST FIPS 203/204 parameter specifications, as summarized in DigiCert, "An In-Depth Look At The NIST PQC Algorithms," and academic surveys citing the original FIPS documents. 
-[^15]: NIST FIPS 206 (FN-DSA / Falcon), in final standardization. 
-[^16]: NIST selection of HQC as a fifth PQC algorithm (code-based KEM backup), March 2025. 
-[^17]: U.S. National Security Agency, Commercial National Security Algorithm Suite 2.0 (CNSA 2.0), 2030 migration deadline for National Security Systems. 
-[^18]: Comparative signature-size analysis, arXiv preprint "Post-Quantum Cryptography Migration in Australian Real-Time Payment Infrastructure" (2026) and related 2025–2026 PQC-in-finance preprints. 
-[^19]: S. Celi, R. del Pino, T. Espitau, G. Niot, T. Prest, "Efficient Threshold ML-DSA," IACR ePrint 2026/013 (to appear, USENIX Security '26); "TALUS: Threshold ML-DSA with One-Round Online Signing," arXiv 2603.22109, 2026. 
-[^20]: Financial Action Task Force, Recommendation 16 ("the Travel Rule"), 2019 Updated Guidance for a Risk-Based Approach to Virtual Assets and VASPs, with 2021 revised guidance; EU Transfer of Funds Regulation (TFR) as the EU implementation. 
-[^21]: McKinsey & Company, "From Ripples to Waves: The Transformational Power of Tokenizing Assets," June 2024. 
-[^22]: Boston Consulting Group, "Relevance of On-Chain Asset Tokenization in 'Crypto Winter'" (2022 estimate); BCG/Ripple, "New Value in Motion" (2025 joint estimate); Standard Chartered tokenization market research. 
-[^23]: Independent 2026 market tracking of tokenized RWA categories (tokenized private credit and tokenized U.S. Treasuries), as aggregated in industry analyses of RWA.xyz-type datasets.
+### 3.1 System Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Phase 6: Unified Dashboard (Next.js 15 + Tailwind + Recharts)     │
+├─────────────────────────────────────────────────────────────────────┤
+│  API Gateway (Hono / TypeScript / Node 22)                         │
+│  REST + WebSocket + JWT AuthN + Rate Limiting                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │  Phase 1: Security Core (Rust)                                │ │
+│  │  • FROST 2-of-3 threshold signing (frost-secp256k1-evm)      │ │
+│  │  • DKG ceremony (ML-KEM-768 key exchange)                     │ │
+│  │  • Key share encryption (AES-256-GCM)                         │ │
+│  │  • Safe smart account (EIP-1271)                              │ │
+│  └───────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │  Phase 2: Portfolio Engine (TypeScript)                       │ │
+│  │  • Multi-chain indexer (viem EVM + @solana/web3.js)          │ │
+│  │  • Market pricing (CoinGecko / Chainlink)                     │ │
+│  │  • Risk metrics (Sharpe, VaR, HHI, drawdown)                 │ │
+│  └───────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │  Phase 3: Compliance Layer (TypeScript)                       │ │
+│  │  • OFAC SDN ingestion (daily auto-refresh)                    │ │
+│  │  • Address matching (exact + ENS reverse)                     │ │
+│  │  • Pre-flight screening (BLOCK / FLAG / CLEAN)               │ │
+│  └───────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │  Phase 4: AI Agent Layer (Python 3.12 / FastAPI)             │ │
+│  │  • Risk Sentinel (LLM-backed, structured output)             │ │
+│  │  • Logged reasoning (claim → evidence → confidence)          │ │
+│  │  • Portfolio state ingestion (real positions + prices)       │ │
+│  └───────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │  Phase 5: Execution Engine (TypeScript)                       │ │
+│  │  • Pre-trade simulation (slippage, gas, impact)              │ │
+│  │  • DEX aggregator (1inch testnet)                             │ │
+│  │  • FROST signing → Safe execution → confirmation             │ │
+│  └───────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+├─────────────────────────────────────────────────────────────────────┤
+│  Data: PostgreSQL 16 + TimescaleDB + pgvector + Redis 7            │
+├─────────────────────────────────────────────────────────────────────┤
+│  Blockchain: viem (EVM) | @solana/web3.js (Solana)                 │
+│  Contracts: Safe + safe-frost verifier (deployed to testnet)       │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 3.2 Design Principles
+
+| Principle | Rationale |
+|---|---|
+| **Self-hosted by default** | No data leaves the machine except LLM API calls (Phase 4) and RPC reads. The user controls the blast radius. |
+| **Threshold over single-key** | No full private key ever exists. 2-of-3 FROST means no single device, file, or process can move funds. |
+| **Post-quantum where it matters** | ML-KEM-768 for key exchange (the layer a quantum adversary would target). FROST secp256k1 for signing (on-chain verifiable, no PQC precompile needed). |
+| **Explainable AI, not black-box** | Every AI finding includes claim, evidence, confidence, and source. All LLM calls logged. No opaque "the AI says sell." |
+| **Compliance as a gate, not an afterthought** | OFAC screening happens *before* signing. A blocked transaction never reaches the FROST ceremony. |
+| **Testnet-first** | v0.x executes only on testnet. Mainnet gating is a deliberate, separate decision requiring additional safeguards. |
+| **Open-core** | Full platform is MIT. Commercial tier adds HSM, mainnet, managed infra. No feature is locked behind a login wall in the open version. |
+
+### 3.3 Why FROST, Not ML-DSA-65, for Signing
+
+This is a deliberate architectural choice:
+
+| Property | FROST (secp256k1, keccak256) | ML-DSA-65 |
+|---|---|---|
+| On-chain verifier (EVM) | ✅ `safe-frost` contract, ~5,600 gas | ❌ No precompile, no efficient verifier |
+| Signature size | 65 bytes (R, z) | ~2,420 bytes |
+| Gas cost to verify | ~5,600 | Est. 500K+ (if a verifier existed) |
+| Threshold capability | ✅ 2-of-3, 3-of-5, etc. | ❌ No threshold variant |
+| Post-quantum | ❌ (secp256k1 is classical) | ✅ |
+| Standard | ZCash FROST spec + Safe Research EVM variant | NIST FIPS 204 |
+
+**Resolution**: Use FROST for the *signing* layer (where on-chain verifiability is non-negotiable) and ML-KEM-768 for the *key exchange* layer (where post-quantum resistance is the primary threat model). This is a hybrid approach that matches the actual threat: a quantum adversary targets key exchange, not on-chain signature verification (which is public and doesn't need to remain secret).
+
+---
+
+## 4. Security Model
+
+### 4.1 Threat Model
+
+| Threat | Mitigation |
+|---|---|
+| Single device compromise | 2-of-3 FROST: one compromised share is insufficient to sign |
+| Key share theft (file) | AES-256-GCM encryption at rest. Local password. No key in DB. |
+| Quantum adversary intercepting DKG traffic | ML-KEM-768 (FIPS 204) for key exchange during ceremony |
+| Malicious counterparty | OFAC SDN pre-flight screening. Hard block on match |
+| Phishing / social engineering | Safe smart account: transactions are structured calls, not raw EOA transfers. Multi-sig approval required |
+| API compromise | JWT auth, rate limiting, read-only default. Write ops require FROST ceremony |
+| LLM prompt injection (Phase 4) | Structured output enforcement (function calling). LLM has no execution capability — it produces *signals*, not actions. Human or policy engine must approve |
+| Supply chain (dependencies) | `pnpm audit`, `cargo audit`, `pip audit` in CI. Lock files committed. |
+
+### 4.2 Key Lifecycle
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  1. DKG CEREMONY (one-time, requires 2-of-3 participants)      │
+│                                                                  │
+│  Each participant generates a local key pair.                   │
+│  Public shares exchanged via ML-KEM-768 encapsulation.          │
+│  Result: shared public key → Safe contract address.             │
+│  3 private shares distributed. Each encrypted with AES-256-GCM  │
+│  (password-derived key via Argon2id). Stored in ~/.odamp/keys/  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  2. SIGNING (every transaction)                                 │
+│                                                                  │
+│  1. Build Safe tx (call data, to, value, nonce)                 │
+│  2. OFAC screen counterparty → BLOCKED? Abort.                 │
+│  3. FROST Round 1: 2 shares → nonces + commitments (broadcast)  │
+│  4. FROST Round 2: 2 shares → signature shares                 │
+│  5. Aggregate → (R, z) Schnorr signature                        │
+│  6. Submit to Safe contract (safe-frost verifier, ~5600 gas)   │
+│  7. Safe executes on-chain                                      │
+│                                                                  │
+│  The full private key NEVER exists. Not in memory, not on disk, │
+│  not in any single process.                                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  3. KEY ROTATION (optional, periodic)                           │
+│                                                                  │
+│  Re-run DKG with same or new participants.                      │
+│  Deploy new Safe contract (or upgrade via Safe governance).     │
+│  Old key shares invalidated (encrypted files deleted).          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 4.3 Audit Trail
+
+Every operation produces a log entry:
+
+| Event | Logged Fields |
+|---|---|
+| Key generation | Timestamp, participants, ML-KEM parameters, resulting Safe address |
+| Signing ceremony | Timestamp, shares used (IDs, not contents), tx hash, gas |
+| OFAC screen | Timestamp, address screened, result (BLOCK/FLAG/CLEAN), matched entity (if any), SDN list version |
+| AI analysis | Timestamp, model, prompt hash, response, tokens, latency, findings |
+| Execution | Timestamp, quote ID, slippage, gas, tx hash, block, status |
+| Policy trigger | Timestamp, rule ID, trigger condition met, action taken |
+
+All logs are append-only in PostgreSQL. No deletion. Exportable to CSV/JSON for external audit.
+
+---
+
+## 5. Technical Differentiation
+
+### 5.1 vs. Existing Self-Custody Wallets
+
+| Feature | MetaMask / Phantom | Safe (Gnosis) | ODAMP |
+|---|---|---|---|
+| Single key | ✅ (vulnerability) | ❌ (multi-sig) | ❌ (FROST 2-of-3) |
+| Threshold crypto | ❌ | ❌ (ECDSA multi-sig) | ✅ (FROST) |
+| Post-quantum key exchange | ❌ | ❌ | ✅ (ML-KEM-768) |
+| Multi-chain | Limited | EVM only | EVM + Solana |
+| OFAC screening | ❌ | ❌ | ✅ |
+| AI risk analysis | ❌ | ❌ | ✅ |
+| Policy-based automation | ❌ | Limited (modules) | ✅ (deterministic engine) |
+| Self-hosted | ✅ | ✅ (Safe{Core} Data) | ✅ |
+| Cost | Free | Free (open) + optional paid | Free (MIT) |
+
+### 5.2 vs. Institutional Custody (Fireblocks, Dfns, Copper)
+
+| Feature | Fireblocks / Dfns | ODAMP |
+|---|---|---|
+| Threshold crypto | ✅ (MPC) | ✅ (FROST) |
+| HSM-backed | ✅ | ❌ (v0.x: file-encrypted) |
+| Mainnet execution | ✅ | ❌ (v0.x: testnet only) |
+| Compliance (KYC/AML) | ✅ | Partial (OFAC only) |
+| Cost | $50K–$500K+/yr | $0 (self-hosted) |
+| Vendor lock-in | High | None (MIT, self-hosted) |
+| On-prem option | Limited (enterprise) | Full (Docker Compose) |
+| AI risk analysis | ❌ (not a feature) | ✅ |
+| Explainable reasoning | ❌ | ✅ (logged) |
+
+### 5.3 The Core Innovation
+
+ODAMP's innovation is not any single component. It is the **integration of threshold cryptography, post-quantum key exchange, compliance screening, and explainable AI into a single self-hosted, open-source tool** that a professional can run on their own hardware with zero vendor dependency.
+
+No existing product combines all five:
+1. FROST threshold signing (on-chain verifiable)
+2. PQC key exchange (ML-KEM-768)
+3. OFAC pre-flight screening
+4. LLM-backed explainable risk analysis
+5. Policy-based automated execution
+
+Each component exists in isolation (FROST in ZCash, ML-KEM in OpenSSL, OFAC screening in Chainalysis, AI analysis in various DeFi tools, execution in 1inch). ODAMP is the **integration layer** that makes them work together in a coherent, auditable, self-hosted system.
+
+---
+
+## 6. The AI Agent: Risk Sentinel
+
+### 6.1 Design Philosophy
+
+The AI agent does **not** execute. It **advises**. This is a deliberate boundary:
+
+```
+AI Agent (Phase 4)          Policy Engine (Phase 5)         Execution
+─────────────────           ─────────────────────           ─────────
+Analyzes portfolio  ──→     Evaluates trigger rules  ──→    FROST signs
+Produces signals          If signal matches rule              Safe executes
+Logs reasoning            Action: alert / rebalance / freeze  On-chain tx
+No execution authority     Deterministic, auditable           Confirmed
+```
+
+The AI can say "concentration risk is high, consider reducing ETH." The policy engine decides whether that signal triggers an alert, a rebalancing trade, or nothing. A human can override at any step.
+
+### 6.2 Explainability Requirement
+
+Every finding must include:
+
+```json
+{
+  "claim": "Concentration risk: 72% in single asset (ETH)",
+  "evidence": "Position value $14,400 of $20,000 total. HHI = 0.58 (threshold: 0.40)",
+  "confidence": 0.95,
+  "source": "portfolio_state + hhi_calculation",
+  "recommendation": "Reduce ETH to <50% allocation",
+  "severity": "ELEVATED"
+}
+```
+
+The `evidence` field must reference specific data points from the portfolio state. The `source` field identifies which computation or data feed produced the finding. This makes the AI's reasoning **auditable** — a user (or external auditor) can verify the claim against the raw data.
+
+### 6.3 Logging
+
+Every LLM call is logged:
+
+| Field | Purpose |
+|---|---|
+| `timestamp` | When |
+| `model` | Which model (claude-sonnet-4, gpt-4o, etc.) |
+| `prompt_hash` | SHA-256 of the full prompt (reproducibility) |
+| `prompt_tokens` | Cost tracking |
+| `completion_tokens` | Cost tracking |
+| `latency_ms` | Performance |
+| `response` | Full structured output |
+| `findings_count` | How many findings produced |
+| `max_severity` | Highest severity level in response |
+
+This creates a complete audit trail of AI reasoning. If a rebalancing decision is questioned, the full prompt and response are available.
+
+---
+
+## 7. Compliance: OFAC SDN Screening
+
+### 7.1 Scope
+
+ODAMP v0.x performs **OFAC Specially Designated Nationals (SDN) List** screening only. This is:
+- The most critical sanctions list for US persons
+- Publicly available (no API key required)
+- Updated regularly by the Treasury Department
+- Sufficient for individual professionals and small teams
+
+It does **not** include:
+- EU consolidated sanctions list
+- UN Security Council lists
+- UK HMT lists
+- Sectoral sanctions (SDP, CAPTA, etc.)
+- Full KYC/AML identity verification
+
+These are commercial-tier concerns.
+
+### 7.2 Matching Logic
+
+```
+Input: Counterparty address (EVM or Solana)
+
+1. Exact match against SDN address list → BLOCKED
+2. ENS reverse lookup (EVM) → name match against SDN names → FLAGGED
+3. Label match (if address has a known label in the indexer) → FLAGGED
+4. No match → CLEAN
+
+BLOCKED: Transaction aborts. No signing. Logged.
+FLAGGED: Transaction pauses. Alert to user. Manual override required.
+CLEAN: Proceed to FROST signing.
+```
+
+### 7.3 Data Freshness
+
+- SDN list fetched daily via `infra/scripts/load-ofac-sdn.sh`
+- List version (date + hash) stored in DB
+- Every screening result includes the list version used
+- If list fetch fails, screening degrades to **FLAGGED** (fail-closed, not fail-open)
+
+---
+
+## 8. Execution Model (Testnet)
+
+### 8.1 Pre-Trade Simulation
+
+Before any execution, the system produces a simulation:
+
+```json
+{
+  "from": "0xUSDC (Base Sepolia)",
+  "to": "0xWETH (Base Sepolia)",
+  "amount": "100 USDC",
+  "route": "1inch v5 → Uniswap V3 → Curve",
+  "expected_out": "0.0284 WETH",
+  "slippage_tolerance": "0.5%",
+  "gas_estimate": "142,000 gas",
+  "gas_cost_eth": "0.000085 ETH",
+  "gas_cost_usd": "$0.28",
+  "total_cost_usd": "$0.31",
+  "simulated_at": "2026-09-18T14:32:00Z"
+}
+```
+
+### 8.2 Execution Flow
+
+```
+1. User requests trade (or policy engine triggers)
+2. Pre-trade simulation produced → shown to user (or auto-approved if within policy bounds)
+3. OFAC screen on counterparty (DEX router address) → CLEAN
+4. FROST ceremony: 2-of-3 shares sign the Safe tx
+5. Safe executes on Base Sepolia
+6. Confirmation received → logged
+7. Portfolio engine re-indexes → new state reflected in dashboard
+```
+
+### 8.3 Why Testnet Only (v0.x)
+
+- No real financial loss possible
+- Full execution pipeline can be tested end-to-end
+- FROST signing, Safe execution, DEX routing, and portfolio re-indexing all validated
+- Mainnet gating will require: additional approval layers, insurance, possibly a timelock, and a separate security review
+
+---
+
+## 9. Open-Core Model
+
+### 9.1 Open (MIT License)
+
+- Full source code for all 6 phases
+- FROST wallet, DKG, signing
+- Multi-chain indexer
+- OFAC screening
+- Risk Sentinel agent
+- Policy engine
+- Testnet execution
+- Dashboard
+- Docker Compose deployment
+- All documentation
+
+### 9.2 Commercial Tier (Future, Separate License)
+
+| Feature | Why Commercial |
+|---|---|
+| HSM-backed key shares | Requires HSM hardware or cloud HSM subscription |
+| Mainnet execution | Requires insurance, additional security review, legal review |
+| Managed infrastructure | Hosting, monitoring, backup, patching |
+| Full KYC/AML pipeline | Requires licensed data providers (Chainalysis, Elliptic) |
+| Multi-tenant SaaS | Requires infrastructure investment |
+| Enterprise support | SLA, onboarding, training |
+| Additional AI agents | Tax Optimizer, Yield Hunter, Compliance Auditor |
+| Cross-chain bridge execution | Requires bridge liquidity and insurance |
+
+The open version is **fully functional** for personal and small-team use on testnet. The commercial tier adds production readiness, mainnet access, and managed services.
+
+---
+
+## 10. Roadmap
+
+| Phase | Name | Deliverable |
+|---|---|---|---|
+| **0** | Foundation | Repo, DB, API skeleton, Docker. `curl /health` → 200 |
+| **1** | Security Core | FROST 2-of-3 wallet. DKG. Sign on Sepolia. Safe + safe-frost deployed |
+| **2** | Portfolio Engine | Multi-chain indexer. Live pricing. Risk metrics. Dashboard shows real data |
+| **3** | Compliance Layer | OFAC SDN loaded. Screen endpoint works. Block/Flag/Clean logic |
+| **4** | AI Agent Layer | Risk Sentinel live. Structured output. Full logging. Explainable findings |
+| **5** | Execution (testnet) | Pre-trade sim. 1inch testnet. FROST → Safe → confirmed tx on Base Sepolia |
+| **6** | Frontend | Unified dashboard. All phases reflected. No mocks |
+
+**Total to v0.x complete: ~32 weeks (8 months) for a single experienced engineer.**
+
+### Post-v0.x
+
+| Milestone | Notes |
+|---|---|
+| v0.5 | Mainnet execution (gated). Additional chains (Arbitrum, BSC) |
+| v1.0 | HSM integration. SOC 2 Type I. First external users |
+| v1.5 | Tokenized RWA tracking. Additional AI agents. Cross-chain reads |
+| v2.0 | Commercial tier launch. Managed SaaS. Enterprise features |
+
+---
+
+## 11. Risks & Limitations
+
+| Risk | Mitigation |
+|---|---|
+| FROST is not as battle-tested as ECDSA multi-sig | `frost-secp256k1-evm` is used by Safe (production Solidity verifier). ZCash uses FROST in production. But the EVM-specific variant is newer. |
+| ML-KEM-768 is not yet deployed at scale | NIST-finalized (FIPS 204, Aug 2024). OpenSSL 3.5+ supports it. But real-world deployment experience is limited. |
+| Single-engineer project | Bus factor = 1. Mitigation: full documentation, CI/CD, clear phase boundaries, open-source community. |
+| Testnet ≠ mainnet | Gas dynamics, MEV, slippage, and liquidity differ. Mainnet will require re-testing. |
+| LLM non-determinism | Structured output enforcement. Confidence scores. Human-in-the-loop for all actions. |
+| OFAC list is US-only | Not a global compliance solution. EU/UK/UN lists are commercial-tier. |
+| No insurance | Self-custody means the user bears all risk. No platform to sue. |
+
+---
+
+## 12. References
+
+1. **FROST**: "FROST: Flexible Round-Optimized Schnorr Threshold Signatures" — ZCash Foundation, 2021.
+2. **frost-secp256k1-evm**: ZCash Foundation Rust crate, v2.2.0 (2026). EVM-compatible FROST with keccak256.
+3. **Safe FROST Verifier**: Safe Research, 2025. Solidity contract for on-chain FROST signature verification (~5,600 gas).
+4. **ML-KEM (FIPS 204)**: NIST, August 2024. "Module-Lattice-Based Key-Encapsulation Mechanism."
+5. **ML-DSA (FIPS 204)**: NIST, August 2024. "Module-Lattice-Based Digital Signature Algorithm."
+6. **OFAC SDN List**: US Treasury Department. `https://sanctions.ofac.treas.gov/api/sdn/v1/sdnList`
+7. **Safe (Gnosis Safe)**: `https://github.com/safe-global/safe-smart-account`
+8. **1inch Swap API**: `https://docs.1inch.io/`
+9. **viem**: `https://viem.sh/` — TypeScript Ethereum library.
+10. **TimescaleDB**: `https://timescale.com/` — PostgreSQL time-series extension.
+11. **Kinexys by J.P. Morgan**: Reference architecture for institutional blockchain-based settlement.
+12. **GENIUS Act (2025)**: US federal stablecoin framework. Context for digital asset regulation.
+
+---
+
+## 13. Conclusion
+
+ODAMP fills a specific gap: **institutional-grade security primitives, accessible to individuals and small teams, without institutional pricing or vendor lock-in.**
+
+It does not reinvent cryptography. It does not create a new consensus mechanism. It does not issue a token. It integrates existing, well-researched components — FROST threshold signing, post-quantum key exchange, OFAC screening, LLM-backed analysis, and policy-based execution — into a single, self-hosted, auditable, open-source tool.
+
+The result is a platform where a professional can:
+- Hold keys that no single entity (including themselves, on a single device) can compromise
+- Exchange keys using post-quantum cryptography
+- See their entire multi-chain portfolio in real time
+- Know immediately if a counterparty is sanctioned
+- Get AI-assisted risk analysis with full reasoning logged
+- Execute trades on testnet with pre-trade simulation and multi-party approval
+
+All of this runs on their own hardware. All of this is MIT-licensed. All of this is auditable.
+
+That is ODAMP.
+
+---
+

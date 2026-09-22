@@ -1,0 +1,96 @@
+Run Risk Sentinel analysis on a portfolio.
+
+Request:
+
+{ "wallet_id": "uuid" }
+
+Response:
+
+{
+  "risk_level": "ELEVATED",
+  "findings": [
+    {
+      "claim": "Concentration risk: 48% in ETH",
+      "evidence": "ETH value $14,000 of $29,000 total. HHI = 0.35",
+      "confidence": 0.95,
+      "source": "portfolio_state",
+      "severity": "ELEVATED"
+    }
+  ],
+  "recommendations": ["Consider diversifying ETH allocation below 40%"],
+  "model": "claude-sonnet-4-20250514",
+  "latency_ms": 2340
+}
+
+
+### `docs/security.md`
+
+```markdown
+# ODAMP Security Model
+
+## Threat Model
+
+| Threat | Mitigation |
+|---|---|
+| Single device compromise | FROST 2-of-3: one share is insufficient |
+| Key share file theft | AES-256-GCM encryption, Argon2id KDF, 0600 permissions |
+| Quantum adversary (key exchange) | ML-KEM-768 (FIPS 203) during DKG |
+| Sanctioned counterparty | OFAC SDN pre-flight screening, hard block |
+| API compromise | JWT auth, rate limiting, read-only default |
+| LLM prompt injection | Structured output, no execution authority, full logging |
+| Supply chain | `cargo audit` in CI, lock files, pinned dependencies |
+
+Key Lifecycle
+DKG: Trusted dealer generates 3 shares. ML-KEM-768 for share exchange. Shares encrypted with AES-256-GCM (password → Argon2id → key).
+Signing: 2-of-3 shares decrypt → FROST rounds → aggregate → Schnorr sig. Full key never exists.
+Rotation: Re-run DKG. New Safe contract. Old shares deleted.
+
+Audit Trail
+All operations logged to PostgreSQL:
+
+signing_logs: every FROST ceremony
+compliance_logs: every screen (append-only)
+ai_agent_logs: every LLM call (prompt hash, response, latency)
+execution_logs: every trade (quote, fill, tx hash)
+No log entries are ever deleted. Exportable for external audit.
+
+---
+
+## Final: Verify & Run
+
+```bash
+# 1. Build Rust workspace
+cargo build --workspace
+
+# 2. Run tests
+cargo test --workspace
+
+# 3. Start infra
+docker compose -f infra/docker-compose.yml up -d
+
+# 4. Run migrations (auto-applied by docker-entrypoint-initdb.d)
+# Verify:
+psql postgresql://odamp:odamp_dev@localhost:5432/odamp -c "\dt"
+
+# 5. Start API
+cargo run -p odamp-api
+# → "ODAMP API listening on 0.0.0.0:3000"
+
+# 6. Health check
+curl http://localhost:3000/health
+# → {"status":"ok","version":"0.1.0","timestamp":"..."}
+
+# 7. Start AI agent (separate terminal)
+cd services/ai-agent
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app:app --reload --port 8000
+
+# 8. Test AI agent
+curl http://localhost:8000/health
+# → {"status":"ok","agent":"risk_sentinel","model":"claude-sonnet-4-20250514"}
+
+# 9. CLI
+cargo run -p odamp-cli -- wallet create --shares 3 --threshold 2
+cargo run -p odamp-cli -- balance --address 0xYourAddress --chain ethereum
+cargo run -p odamp-cli -- screen --address 0xSomeAddress   

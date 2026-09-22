@@ -1,0 +1,16 @@
+Screen an address against OFAC SDN list.
+
+Request:
+
+{ "address": "0x..." }
+
+Response:
+
+{
+  "status": "CLEAN",
+  "address": "0x...",
+  "matched_entity": null,
+  "program": null,
+  "list_version": "18700 entries, 3400 addresses, 2026-09-18T06:00:00Z",
+  "screened_at": "2026-09-18T12:00:00Z"
+}
