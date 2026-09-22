@@ -148,7 +148,7 @@ EOF
 
 ## Project Structure
 
-```
+```text
 odamp/
 ├── apps/
 │   ├── web/                  # Phase 6: Next.js dashboard
