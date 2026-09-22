@@ -20,36 +20,45 @@ for native tokens and tokenized RWAs across EVM and Solana chains.
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    subgraph UI ["Frontend"]
-        P6["Phase 6: Unified Dashboard<br><i>(Next.js + Tailwind + Recharts)</i>"]
-    end
-
-    subgraph Gateway ["API Layer"]
-        API["API Gateway<br><i>(Hono / TypeScript) — REST + WebSocket + AuthN</i>"]
-    end
-
-    subgraph Core ["System Core"]
-        P1["<b>Phase 1: Security Core (Rust)</b><br>• FROST 2-of-3 threshold signing<br>• DKG key generation ceremony<br>• AES-256-GCM + ML-KEM-768 encryption<br>• Safe smart account (EIP-1271)"]
-        
-        P2["<b>Phase 2: Portfolio Engine (TypeScript)</b><br>• Multi-chain indexer<br>• Real market pricing (CoinGecko/Chainlink)<br>• Risk metrics (Sharpe, Sortino, VaR, HHI)"]
-        
-        P3["<b>Phase 3: Compliance Layer (TypeScript)</b><br>• OFAC SDN list ingestion & auto-refresh<br>• Address matching (exact + fuzzy via ENS)<br>• Pre-flight screening (block/flag/alert)"]
-        
-        P4["<b>Phase 4: AI Agent Layer (Python / FastAPI)</b><br>• Risk Sentinel agent (LLM-backed)<br>• Portfolio state analysis<br>• Explainable output (claim → evidence → conf)"]
-        
-        P5["<b>Phase 5: Execution Engine (TypeScript)</b><br>• Pre-trade simulation<br>• DEX aggregator integration (1inch / 0x)<br>• FROST signing → Safe execution"]
-    end
-
-    subgraph Infrastructure ["Data & Infrastructure"]
-        DATA[("Data Layer<br>PostgreSQL 16 + TimescaleDB + pgvector + Redis 7")]
-        CHAIN["Chain Layer<br>viem (EVM) | @solana/web3.js | safe-frost verifier"]
-    end
-
-    UI --> Gateway
-    Gateway --> Core
-    Core --> Infrastructure
+```text
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ Phase 6: Unified Dashboard (Next.js + Tailwind + Recharts)                   │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ API Gateway (Hono / TypeScript) — REST + WebSocket + AuthN                   │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│ Phase 1: Security Core (Rust)                                                │
+│ ├── FROST 2-of-3 threshold signing (frost-secp256k1-evm)                     │
+│ ├── Key generation ceremony (DKG, trusted dealer)                            │
+│ ├── Key share encryption at rest (AES-256-GCM + ML-KEM-768)                  │
+│ └── Safe smart account (EIP-1271) as the on-chain wallet                     │
+│                                                                              │
+│ Phase 2: Portfolio Engine (TypeScript)                                       │
+│ ├── Multi-chain indexer (viem for EVM, @solana/web3.js)                      │
+│ ├── Real market pricing (CoinGecko / Chainlink on-chain)                     │
+│ └── Risk metrics (Sharpe, Sortino, VaR, max drawdown, HHI)                   │
+│                                                                              │
+│ Phase 3: Compliance Layer (TypeScript)                                       │
+│ ├── OFAC SDN list ingestion (public CSV/JSON, auto-refresh)                  │
+│ ├── Address matching (exact + fuzzy via ENS/reverse lookup)                  │
+│ └── Transaction pre-flight screening (block/flag/alert)                      │
+│                                                                              │
+│ Phase 4: AI Agent Layer (Python / FastAPI)                                   │
+│ ├── Risk Sentinel agent (LLM-backed, logged reasoning)                       │
+│ ├── Portfolio state analysis (real positions, real prices)                   │
+│ └── Explainable output (structured JSON: claim → evidence → conf)            │
+│                                                                              │
+│ Phase 5: Execution Engine (TypeScript)                                       │
+│ ├── Pre-trade simulation (slippage, gas, impact model)                       │
+│ ├── DEX aggregator integration (1inch / 0x testnet)                          │
+│ └── FROST signing → Safe execution on testnet                                │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Data: PostgreSQL 16 + TimescaleDB + pgvector + Redis 7                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Blockchain: viem (EVM) | @solana/web3.js (Solana)                            │
+│ Safe: safe-frost Solidity verifier (deployed to testnet)                     │
+└──────────────────────────────────────────────────────────────────────────────┘
 
 ---
 
