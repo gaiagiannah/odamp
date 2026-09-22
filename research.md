@@ -249,35 +249,35 @@ The flagship platform, built with Dfns:
 
 ### 5.5 The Ecosystem Map
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    ODAMP PLATFORM (This Project)                      │
-├─────────────────────────────────────────────────────────────────────┤
-│  User Layer: Mobile / Web / API / Natural Language                   │
-├─────────────────────────────────────────────────────────────────────┤
-│  AI Agent Layer: Portfolio Mgr | Risk Sentinel | Yield Opt |         │
-│  Compliance Agent | Geopolitical Intel | Scam Detection             │
-├─────────────────────────────────────────────────────────────────────┤
-│  Execution Layer: Smart Order Routing | Cross-Chain | MEV Protect   │
-├─────────────────────────────────────────────────────────────────────┤
-│  Security Layer: MPC + PQC + HSM + ZK Proofs + Confidential Compute │
-├─────────────────────────────────────────────────────────────────────┤
-│  Data Layer: On-chain | Market | Geopolitical | Tax | Analytics     │
-├─────────────────────────────────────────────────────────────────────┤
-│  Integration Layer:                                                  │
-│  ┌──────────┬──────────┬───────────┬──────────┬──────────────────┐  │
-│  │ Talos    │ Chainlink│ Coin      │ LayerZero│ Securitize/Ondo  │  │
-│  │ (exec)   │ (oracle) │ Metrics   │ (bridge) │ (tokenized RWA)  │  │
-│  ├──────────┼──────────┼───────────┼──────────┼──────────────────┤  │
-│  │ Fnality  │ Circle   │ Taurus    │ Inca     │ Silence Labs     │  │
-│  │ (settle) │ (USDC)   │ (custody) │ (intel)  │ (PQ-MPC)         │  │
-│  ├──────────┼──────────┼───────────┼──────────┼──────────────────┤  │
-│  │ Nansen   │ Dune     │ Yearn/    │ QuantConnect│ DTCC/Euroclear│  │
-│  │ (analytics)│ (data)  │ Aave/Morpho│ (algo)   │ (tokenized sec) │  │
-│  └──────────┴──────────┴───────────┴──────────┴──────────────────┘  │
-├─────────────────────────────────────────────────────────────────────┤
-│  Infrastructure: Multi-cloud | Edge | Satellite | Mesh | HSM       │
-└─────────────────────────────────────────────────────────────────────┘
+```text
+┌────────────────────────────────────────────────────────────────────────────┐
+│                       ODAMP PLATFORM (This Project)                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│  User Layer: Mobile / Web / API / Natural Language                         │
+├────────────────────────────────────────────────────────────────────────────┤
+│  AI Agent Layer: Portfolio Mgr | Risk Sentinel | Yield Opt |               │
+│  Compliance Agent | Geopolitical Intel | Scam Detection                    │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Execution Layer: Smart Order Routing | Cross-Chain | MEV Protect          │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Security Layer: MPC + PQC + HSM + ZK Proofs + Confidential Compute        │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Data Layer: On-chain | Market | Geopolitical | Tax | Analytics            │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Integration Layer:                                                        │
+│  ┌────────────┬───────────┬────────────┬─────────────┬──────────────────┐  │
+│  │ Talos      │ Chainlink │ Coin       │ LayerZero   │ Securitize/Ondo  │  │
+│  │ (exec)     │ (oracle)  │ Metrics    │ (bridge)    │ (tokenized RWA)  │  │
+│  ├────────────┼───────────┼────────────┼─────────────┼──────────────────┤  │
+│  │ Fnality    │ Circle    │ Taurus     │ Inca        │ Silence Labs     │  │
+│  │ (settle)   │ (USDC)    │ (custody)  │ (intel)     │ (PQ-MPC)         │  │
+│  ├────────────┼───────────┼────────────┼─────────────┼──────────────────┤  │
+│  │ Nansen     │ Dune      │ Yearn/     │ QuantConnect│ DTCC/Euroclear   │  │
+│  │ (analytics)│ (data)    │ Aave/Morpho│ (algo)      │ (tokenized sec)  │  │
+│  └────────────┴───────────┴────────────┴─────────────┴──────────────────┘  │
+├────────────────────────────────────────────────────────────────────────────┤
+│  Infrastructure: Multi-cloud | Edge | Satellite | Mesh | HSM               │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -382,57 +382,57 @@ ODAMP is to digital asset management what **Android** was to mobile computing: a
 
 ### 9.1 High-Level Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         ODAMP SYSTEM ARCHITECTURE                        │
+│                         ODAMP SYSTEM ARCHITECTURE                       │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │                    PRESENTATION LAYER                             │  │
-│  │  Mobile App (iOS/Android) │ Web App │ CLI │ API │ Natural Lang.  │  │
+│  │  Mobile App (iOS/Android) │ Web App │ CLI │ API │ Natural Lang.   │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              │                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │                    APPLICATION LAYER                              │  │
-│  │  Portfolio Engine │ Trading Engine │ Tax Engine │ Compliance     │  │
-│  │  Analytics Engine │ Geopolitical Engine │ Notification Service   │  │
+│  │  Portfolio Engine │ Trading Engine │ Tax Engine │ Compliance      │  │
+│  │  Analytics Engine │ Geopolitical Engine │ Notification Service    │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              │                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │                    AI AGENT LAYER                                 │  │
-│  │  Portfolio Mgr │ Risk Sentinel │ Yield Opt │ Compliance Agent    │  │
-│  │  Geopolitical Intel │ Scam Detection │ Tax Advisor │ Executor    │  │
+│  │  Portfolio Mgr │ Risk Sentinel │ Yield Opt │ Compliance Agent     │  │
+│  │  Geopolitical Intel │ Scam Detection │ Tax Advisor │ Executor     │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              │                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │                    EXECUTION LAYER                                │  │
-│  │  Smart Order Router │ Cross-Chain Executor │ MEV Protection      │  │
-│  │  DEX Aggregator │ CEX Gateway │ OTC Connector │ Intent Engine    │  │
+│  │  Smart Order Router │ Cross-Chain Executor │ MEV Protection       │  │
+│  │  DEX Aggregator │ CEX Gateway │ OTC Connector │ Intent Engine     │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              │                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │                    SECURITY LAYER                                 │  │
-│  │  MPC Key Management │ PQC Signatures │ HSM Interface │ ZK Proofs │  │
+│  │  MPC Key Management │ PQC Signatures │ HSM Interface │ ZK Proofs  │  │
 │  │  Confidential Computing │ Transaction Simulation │ Address Allow  │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              │                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │                    DATA LAYER                                     │  │
-│  │  On-chain Indexer │ Market Data │ Geopolitical DB │ Tax DB       │  │
-│  │  User State (encrypted) │ Strategy Store │ Audit Log (immutable) │  │
+│  │  On-chain Indexer │ Market Data │ Geopolitical DB │ Tax DB        │  │
+│  │  User State (encrypted) │ Strategy Store │ Audit Log (immutable)  │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              │                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │                    INTEGRATION LAYER                              │  │
-│  │  Chainlink │ LayerZero │ Wormhole │ Axelar │ Coin Metrics        │  │
-│  │  Nansen │ Dune │ 1inch │ Uniswap │ Aave │ Morpho │ Securitize   │  │
-│  │  Ondo │ Circle CCTP │ SWIFT │ Fnality │ Inca Digital │ Talos    │  │
+│  │  Chainlink │ LayerZero │ Wormhole │ Axelar │ Coin Metrics         │  │
+│  │  Nansen │ Dune │ 1inch │ Uniswap │ Aave │ Morpho │ Securitize     │  │
+│  │  Ondo │ Circle CCTP │ SWIFT │ Fnality │ Inca Digital │ Talos      │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                              │                                          │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
 │  │                    INFRASTRUCTURE LAYER                           │  │
-│  │  Multi-cloud (AWS/GCP/Azure) │ Edge Nodes │ Satellite (Starlink) │  │
-│  │  Mesh (LoRa/I2P/Tor) │ HSMs (Thales/IBM) │ AI Accelerators      │  │
+│  │  Multi-cloud (AWS/GCP/Azure) │ Edge Nodes │ Satellite (Starlink)  │  │
+│  │  Mesh (LoRa/I2P/Tor) │ HSMs (Thales/IBM) │ AI Accelerators        │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -577,7 +577,7 @@ All agents follow the **Model Context Protocol (MCP)** standard, ensuring intero
 
 Agents do not operate in isolation. The **Orchestrator** coordinates:
 
-```
+```text
 User Input (natural language or action)
          │
          ▼
@@ -796,13 +796,13 @@ The **most geopolitically significant** tokenization category:
 
 ODAMP presents all of the above in a **single dashboard**:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    YOUR PORTFOLIO                            │
-├─────────────────────────────────────────────────────────────┤
+```text
+┌───────────────────────────────────────────────────────────┐
+│                    YOUR PORTFOLIO                         │
+├───────────────────────────────────────────────────────────┤
 │  Total Value: $284,392.17  │  24h: +1.2%  │  30d: +4.7%   │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
+├───────────────────────────────────────────────────────────┤
+│                                                           │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐  │
 │  │ Digital     │ │ Tokenized   │ │ Tokenized           │  │
 │  │ Assets      │ │ Securities  │ │ Commodities         │  │
@@ -811,7 +811,7 @@ ODAMP presents all of the above in a **single dashboard**:
 │  │ BTC, ETH,   │ │ xStocks,    │ │ Gold (PAXG),        │  │
 │  │ USDC, SOL   │ │ Ondo T-bills│ │ Rare Earths (Metals)│  │
 │  └─────────────┘ └─────────────┘ └─────────────────────┘  │
-│                                                             │
+│                                                           │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────┐  │
 │  │ Tokenized   │ │ DeFi        │ │ CBDC / Stablecoin   │  │
 │  │ Real Estate │ │ Yield       │ │                     │  │
@@ -820,10 +820,10 @@ ODAMP presents all of the above in a **single dashboard**:
 │  │ RealT,      │ │ Aave,       │ │ USDC, USDT,         │  │
 │  │ Centrifuge  │ │ Morpho, LP  │ │ (Digital Euro)      │  │
 │  └─────────────┘ └─────────────┘ └─────────────────────┘  │
-│                                                             │
+│                                                           │
 │  Risk: MODERATE │ Sharpe: 1.42 │ Max DD (30d): -3.2%      │
 │  Tax Exposure (unrealized): $12,400 │ Next Filing: 4/15   │
-└─────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -1046,7 +1046,7 @@ ODAMP inherits the cypherpunk principle that **privacy is a civil right** while 
 
 ### 21.2 System Components (Code Modules)
 
-```
+```text
 odamp/
 ├── core/
 │   ├── security/          # MPC, PQC, key management, ZK proofs
@@ -1124,7 +1124,7 @@ odamp/
 
 ### 21.3 API Design (Key Endpoints)
 
-```
+```text
 # Portfolio
 GET    /api/v1/portfolio                    # Full portfolio state
 GET    /api/v1/portfolio/positions          # Individual positions
