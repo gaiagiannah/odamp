@@ -20,7 +20,7 @@ for native tokens and tokenized RWAs across EVM and Solana chains.
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │  Phase 6: Unified Dashboard (Next.js + Tailwind + Recharts)         │
 ├─────────────────────────────────────────────────────────────────────┤
